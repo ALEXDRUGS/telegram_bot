@@ -1,5 +1,7 @@
 package com.example.telegram_bot.listener;
 
+import com.example.telegram_bot.entity.NotificationTask;
+import com.example.telegram_bot.service.NotificationTaskService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
@@ -12,8 +14,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,8 +33,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final TelegramBot telegramBot;
 
-    public TelegramBotUpdatesListener(TelegramBot telegramBot) {
+    private final NotificationTaskService notificationTaskService;
+
+    public TelegramBotUpdatesListener(TelegramBot telegramBot, NotificationTaskService notificationTaskService) {
         this.telegramBot = telegramBot;
+        this.notificationTaskService = notificationTaskService;
     }
 
     @PostConstruct
@@ -45,31 +48,38 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         try {
-            updates.forEach(update -> {
-                logger.info("Handles update: {}", update);
-                Message message = update.message();
-                Long chatId = message.chat().id();
-                String text = message.text();
-                if ("/start".equals(text)) {
-                    sendMassage(chatId, """
-                            Бот планировщик задач запущен.
-                            Введите задачу в формате: дд.мм.гггг чч:мм описание задачи
-                            """);
-                } else if (text != null) {
-                    Matcher matcher = pattern.matcher(text);
-                    if (matcher.find()) {
-                        LocalDateTime dateTime = parse(matcher.group(1));
-                        if (Objects.isNull(dateTime)) {
-                            sendMassage(chatId, "Некорректный формат даты и/или времени!");
-                        } else {
-                            String txt = matcher.group(2);
-                            //continue here
+            updates.stream()
+                    .filter(update -> update.message() != null)
+                    .forEach(update -> {
+                        logger.info("Handles update: {}", update);
+                        Message message = update.message();
+                        Long chatId = message.chat().id();
+                        String text = message.text();
+                        if ("/start".equals(text)) {
+                            sendMassage(chatId, """
+                                    Бот планировщик задач запущен.
+                                    Введите задачу в формате: дд.мм.гггг чч:мм описание задачи
+                                    """);
+                        } else if (text != null) {
+                            Matcher matcher = pattern.matcher(text);
+                            if (matcher.find()) {
+                                LocalDateTime dateTime = parse(matcher.group(1));
+                                if (Objects.isNull(dateTime)) {
+                                    sendMassage(chatId, "Некорректный формат даты и/или времени!");
+                                } else {
+                                    String txt = matcher.group(2);
+                                    NotificationTask notificationTask = new NotificationTask();
+                                    notificationTask.setChatId(chatId);
+                                    notificationTask.setMessage(txt);
+                                    notificationTask.setNotificationDateTime(dateTime);
+                                    notificationTaskService.save(notificationTask);
+                                    sendMassage(chatId, "Задача добавлена!");
+                                }
+                            } else {
+                                sendMassage(chatId, "Некорректный формат сообщения!");
+                            }
                         }
-                    } else {
-                        sendMassage(chatId, "Некорректный формат сообщения!");
-                    }
-                }
-            });
+                    });
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
