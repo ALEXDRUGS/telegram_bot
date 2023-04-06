@@ -1,6 +1,6 @@
-package com.example.telegram_bot.timer;
+package app.telegram_bot.timer;
 
-import com.example.telegram_bot.repository.NotificationTaskRepository;
+import app.telegram_bot.repository.NotificationTaskRepository;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,4 +1,4 @@
-package com.example.telegram_bot.entity;
+package app.telegram_bot.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

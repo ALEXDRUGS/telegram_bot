@@ -1,6 +1,6 @@
-package com.example.telegram_bot.repository;
+package app.telegram_bot.repository;
 
-import com.example.telegram_bot.entity.NotificationTask;
+import app.telegram_bot.entity.NotificationTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

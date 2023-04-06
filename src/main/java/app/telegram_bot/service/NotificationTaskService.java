@@ -1,7 +1,7 @@
-package com.example.telegram_bot.service;
+package app.telegram_bot.service;
 
-import com.example.telegram_bot.entity.NotificationTask;
-import com.example.telegram_bot.repository.NotificationTaskRepository;
+import app.telegram_bot.entity.NotificationTask;
+import app.telegram_bot.repository.NotificationTaskRepository;
 import org.springframework.stereotype.Service;
 
 @Service

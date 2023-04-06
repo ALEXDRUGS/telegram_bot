@@ -1,7 +1,7 @@
-package com.example.telegram_bot.listener;
+package app.telegram_bot.listener;
 
-import com.example.telegram_bot.entity.NotificationTask;
-import com.example.telegram_bot.service.NotificationTaskService;
+import app.telegram_bot.entity.NotificationTask;
+import app.telegram_bot.service.NotificationTaskService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
